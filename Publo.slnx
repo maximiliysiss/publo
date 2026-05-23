@@ -1,0 +1,21 @@
+<Solution>
+  <Folder Name="/common/">
+    <File Path=".editorconfig" />
+    <File Path=".gitignore" />
+    <File Path="Directory.Packages.props" />
+    <File Path="docker-compose.yaml" />
+    <File Path="LICENSE" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <File Path="src\Directory.Build.props" />
+    <Project Path="src/Publo.Abstraction/Publo.Abstraction.csproj" />
+    <Project Path="src/Publo.Kafka/Publo.Kafka.csproj" />
+    <Project Path="src/Publo.Postgres/Publo.Postgres.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <File Path="tests\Directory.Build.props" />
+    <Project Path="tests/Publo.Kafka.IntegrationTests/Publo.Kafka.IntegrationTests.csproj" />
+    <Project Path="tests/Publo.Kafka.UnitTests/Publo.Kafka.UnitTests.csproj" />
+  </Folder>
+</Solution>

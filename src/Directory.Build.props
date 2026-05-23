@@ -1,0 +1,14 @@
+<Project>
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="$(RootNamespace).UnitTests"/>
+    <InternalsVisibleTo Include="$(RootNamespace).IntegrationTests"/>
+    <InternalsVisibleTo Include="$(RootNamespace).Benchmark"/>
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2"/>
+  </ItemGroup>
+</Project>
