@@ -15,6 +15,7 @@
   </Folder>
   <Folder Name="/tests/">
     <File Path="tests\Directory.Build.props" />
+    <Project Path="tests/Publo.Abstraction.UnitTests/Publo.Abstraction.UnitTests.csproj" />
     <Project Path="tests/Publo.Kafka.IntegrationTests/Publo.Kafka.IntegrationTests.csproj" />
     <Project Path="tests/Publo.Kafka.UnitTests/Publo.Kafka.UnitTests.csproj" />
   </Folder>

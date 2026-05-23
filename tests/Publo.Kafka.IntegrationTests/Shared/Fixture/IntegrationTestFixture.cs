@@ -30,7 +30,8 @@ public sealed class IntegrationTestFixture : WebApplicationFactory<IntegrationTe
 
             services
                 .AddPubloExecutor<CommonHandlerTests.Event, CommonHandlerTests.Executor>()
-                .AddPubloExecutor<DoubleServicesHandlerTests.Event, DoubleServicesHandlerTests.Executor>();
+                .AddPubloExecutor<DoubleServicesHandlerTests.Event, DoubleServicesHandlerTests.Executor>()
+                .AddPubloExecutor<MultipleMessagesHandlerTests.Event, MultipleMessagesHandlerTests.Executor>();
         }
 
         public void Configure(IApplicationBuilder app)

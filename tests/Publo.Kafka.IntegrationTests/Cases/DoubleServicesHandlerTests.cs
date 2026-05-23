@@ -38,7 +38,7 @@ public class DoubleServicesHandlerTests : IAsyncLifetime
             .WaitAndRetry(3, _ => TimeSpan.FromSeconds(2))
             .Execute(() => Executor.Counter);
 
-        execute.Should().BeGreaterThan(1);
+        execute.Should().BeGreaterThanOrEqualTo(2);
     }
 
     public sealed record Event(int Value);
