@@ -47,10 +47,34 @@ jobs:
 
     run_test:
         runs-on: ubuntu-latest
+        services:
+            kafka:
+                image: redpandadata/redpanda:v23.3.20
+                ports:
+                    - 9092:9092
+                command: >-
+                    redpanda start
+                    --overprovisioned
+                    --smp=1
+                    --node-id=0
+                    --check=false
+                    --kafka-addr=PLAINTEXT://0.0.0.0:9092
+                    --advertise-kafka-addr=PLAINTEXT://localhost:9092
+            postgres:
+                image: postgres:14
+                ports:
+                    - 5432:5432
+                env:
+                    POSTGRES_PASSWORD: pwd
+                    POSTGRES_USER: postgres
+                    POSTGRES_DB: postgres
+                    POSTGRES_HOST_AUTH_METHOD: trust
         steps:
             - uses: actions/checkout@v3
             - name: Setup .NET
               uses: actions/setup-dotnet@v3
+            - name: Create Kafka topic
+              run: docker exec ${{ job.services.kafka.id }} rpk topic create test --brokers localhost:9092
             - name: Run tests
               run: dotnet test --configuration Release
 
