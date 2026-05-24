@@ -11,8 +11,16 @@ using Publo.Postgres.Runners;
 
 namespace Publo.Postgres.Extensions;
 
+/// <summary>
+/// Provides PostgreSQL provider registration methods for Publo.
+/// </summary>
 public static class PubloBuilderExtensions
 {
+    /// <summary>
+    /// Registers the PostgreSQL Publo provider, repository, migrations, runner hosted service, and options binding.
+    /// </summary>
+    /// <typeparam name="T">The connection factory implementation used by the provider.</typeparam>
+    /// <param name="builder">The Publo builder to configure.</param>
     public static IPubloBuilder UseNpgsql<T>(this IPubloBuilder builder) where T : class, IConnectionFactory
     {
         builder.UseProvider<PostgresPubloProvider>();

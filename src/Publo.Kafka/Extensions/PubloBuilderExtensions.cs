@@ -8,8 +8,15 @@ using Publo.Kafka.Provider;
 
 namespace Publo.Kafka.Extensions;
 
+/// <summary>
+/// Provides Kafka provider registration methods for Publo.
+/// </summary>
 public static class PubloBuilderExtensions
 {
+    /// <summary>
+    /// Registers the Kafka Publo provider, producer, consumer hosted service, and Kafka options binding.
+    /// </summary>
+    /// <param name="builder">The Publo builder to configure.</param>
     public static IPubloBuilder UseKafka(this IPubloBuilder builder)
     {
         builder.UseProvider<KafkaPubloProvider>();
