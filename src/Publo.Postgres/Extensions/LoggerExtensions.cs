@@ -70,4 +70,7 @@ internal static partial class LoggerExtensions
 
     [LoggerMessage(22, LogLevel.Debug, "Postgres message {messageId} handled for client {clientId}.")]
     public static partial void PostgresMessageHandled(this ILogger logger, long messageId, Guid clientId);
+
+    [LoggerMessage(23, LogLevel.Error, "Error processing Postgres messages")]
+    public static partial void ErrorProcessingMessages(this ILogger logger, Exception exception);
 }

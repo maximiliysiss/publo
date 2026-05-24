@@ -56,8 +56,6 @@ internal sealed class KafkaConsumer : RestartableService
                 if (_options.SkipPolicy is SkipPolicy.Strict)
                     throw new InvalidOperationException("No message received");
 
-                consumer.Commit(message);
-
                 continue;
             }
 

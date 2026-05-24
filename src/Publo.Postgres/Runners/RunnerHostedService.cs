@@ -61,13 +61,26 @@ internal sealed class RunnerHostedService : RestartableService
 
         while (!cancellationToken.IsCancellationRequested)
         {
-            using var scope = _serviceProvider.CreateScope();
+            try
+            {
+                using var scope = _serviceProvider.CreateScope();
 
-            var localRepository = scope.ServiceProvider.GetRequiredService<IPostgresRepository>();
+                var localRepository = scope.ServiceProvider.GetRequiredService<IPostgresRepository>();
 
-            await HandleLoopAsync(scope, localRepository, cancellationToken);
+                await HandleLoopAsync(scope, localRepository, cancellationToken);
 
-            await Task.Delay(_options.PollingInterval, cancellationToken);
+                await Task.Delay(_options.PollingInterval, cancellationToken);
+            }
+            catch (Exception ex) when (ex.IsCancel())
+            {
+                // Graceful shutdown
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorProcessingMessages(ex);
+
+                await Task.Delay(_options.PollingInterval, cancellationToken);
+            }
         }
     }
 

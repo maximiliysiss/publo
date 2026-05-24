@@ -128,7 +128,8 @@ LIMIT 1;
     {
         var sql = $@"
 INSERT INTO {_options.SchemaName}.clients (id, created_at)
-VALUES (:clientId, :createdAt);
+VALUES (:clientId, :createdAt)
+ON CONFLICT (id) DO NOTHING;
 ";
 
         _logger.CreatingPostgresClient(clientId.Value);

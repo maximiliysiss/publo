@@ -12,7 +12,7 @@ internal class InfrastructureReadinessWaiter(ILogger<InfrastructureReadinessWait
     public Task ReadyAsync(CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        _completionSource.SetResult();
+        _completionSource.TrySetResult();
         logger.InfrastructureReady();
         return Task.CompletedTask;
     }
