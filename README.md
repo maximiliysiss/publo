@@ -1,6 +1,14 @@
-# Publo
+<div align="center">
+  <img src="assets/publo-icon.png" alt="Publo" width="120" height="120">
+  <h1>Publo</h1>
+  <p>A small .NET messaging abstraction with provider packages for Kafka and PostgreSQL.</p>
 
-Publo is a small .NET messaging abstraction with provider packages for Kafka and PostgreSQL.
+  <p>
+    <a href="https://github.com/maximiliysiss/publo/actions/workflows/dotnet.yml"><img alt="Build" src="https://github.com/maximiliysiss/publo/actions/workflows/dotnet.yml/badge.svg"></a>
+    <a href="LICENSE"><img alt="License" src="https://img.shields.io/github/license/maximiliysiss/publo"></a>
+    <img alt=".NET target frameworks" src="https://img.shields.io/badge/.NET-netstandard2.0%20%7C%20net8.0-512BD4">
+  </p>
+</div>
 
 The core package exposes one sending API, `IPubloService`, and one handler contract,
 `IPubloExecutor<T>`. Provider packages decide where messages are stored or delivered and run hosted
@@ -8,11 +16,11 @@ services that dispatch received messages to registered executors.
 
 ## Packages
 
-| Package | Purpose | Target framework |
-| --- | --- | --- |
-| `Publo.Abstraction` | Core service, handler, provider, and DI registration contracts. | `netstandard2.0` |
-| `Publo.Kafka` | Kafka producer and consumer provider built on `Confluent.Kafka`. | `net8.0` |
-| `Publo.Postgres` | PostgreSQL-backed message store and polling runner. | `net8.0` |
+| Package | NuGet | Purpose | Target framework |
+| --- | --- | --- | --- |
+| `Publo.Abstraction` | [![NuGet](https://img.shields.io/nuget/v/Publo.Abstraction?label=version)](https://www.nuget.org/packages/Publo.Abstraction) [![Downloads](https://img.shields.io/nuget/dt/Publo.Abstraction?label=downloads)](https://www.nuget.org/packages/Publo.Abstraction) | Core service, handler, provider, and DI registration contracts. | `netstandard2.0` |
+| `Publo.Kafka` | [![NuGet](https://img.shields.io/nuget/v/Publo.Kafka?label=version)](https://www.nuget.org/packages/Publo.Kafka) [![Downloads](https://img.shields.io/nuget/dt/Publo.Kafka?label=downloads)](https://www.nuget.org/packages/Publo.Kafka) | Kafka producer and consumer provider built on `Confluent.Kafka`. | `net8.0` |
+| `Publo.Postgres` | [![NuGet](https://img.shields.io/nuget/v/Publo.Postgres?label=version)](https://www.nuget.org/packages/Publo.Postgres) [![Downloads](https://img.shields.io/nuget/dt/Publo.Postgres?label=downloads)](https://www.nuget.org/packages/Publo.Postgres) | PostgreSQL-backed message store and polling runner. | `net8.0` |
 
 ## Basic Usage
 
