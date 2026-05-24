@@ -3,6 +3,8 @@
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,4 +13,21 @@
     <InternalsVisibleTo Include="$(RootNamespace).Benchmark"/>
     <InternalsVisibleTo Include="DynamicProxyGenAssembly2"/>
   </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Authors>maximiliysiss</Authors>
+    <Copyright>Copyright © 2026 maximiliysiss</Copyright>
+    <Version>1.0.0</Version>
+    <RepositoryUrl>https://github.com/maximiliysiss/publo</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/maximiliysiss/publo</PackageProjectUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
 </Project>

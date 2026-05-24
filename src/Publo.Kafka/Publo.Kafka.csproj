@@ -1,6 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
+    <PackageId>Publo.Kafka</PackageId>
+    <Title>Publo.Kafka</Title>
+    <Description>Kafka provider for Publo. Publishes messages to a Kafka topic and runs a hosted consumer that dispatches them to IPubloExecutor handlers.</Description>
+    <PackageTags>publo;kafka;messaging;confluent</PackageTags>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Publo.Abstraction\Publo.Abstraction.csproj" />

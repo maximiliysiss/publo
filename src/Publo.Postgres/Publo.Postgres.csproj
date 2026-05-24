@@ -1,6 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
+    <PackageId>Publo.Postgres</PackageId>
+    <Title>Publo.Postgres</Title>
+    <Description>PostgreSQL provider for Publo. Stores messages in PostgreSQL and runs a hosted polling runner that dispatches them to IPubloExecutor handlers.</Description>
+    <PackageTags>publo;postgres;postgresql;messaging;npgsql</PackageTags>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="DistributedLock.Postgres" />
