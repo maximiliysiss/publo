@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Publo.Abstraction.Executor;
+using Publo.Postgres.Extensions;
 using Publo.Postgres.Entities;
 using Publo.Postgres.Infrastructure.DateTime;
 using Publo.Postgres.Infrastructure.Hosted;
@@ -21,6 +22,8 @@ internal sealed class RunnerHostedService : RestartableService
 
     private readonly IServiceProvider _serviceProvider;
 
+    private readonly ILogger<RunnerHostedService> _logger;
+
     private readonly ClientId _clientId = ClientId.New();
     private readonly DateTimeOffset? _from;
 
@@ -32,6 +35,7 @@ internal sealed class RunnerHostedService : RestartableService
         IServiceProvider serviceProvider,
         IDateTimeProvider dateTimeProvider) : base(logger)
     {
+        _logger = logger;
         _serviceProvider = serviceProvider;
         _options = options.Value;
 
@@ -52,6 +56,7 @@ internal sealed class RunnerHostedService : RestartableService
             var repository = scope.ServiceProvider.GetRequiredService<IPostgresRepository>();
 
             await repository.CreateAsync(_clientId, cancellationToken);
+            _logger.PostgresRunnerClientRegistered(_clientId.Value);
         }
 
         while (!cancellationToken.IsCancellationRequested)
@@ -88,6 +93,7 @@ internal sealed class RunnerHostedService : RestartableService
         await nonGenericExecutor.ExecuteAsync(
             message: message.Payload,
             cancellationToken: cancellationToken);
+        _logger.PostgresMessageHandled(message.Id.Value, _clientId.Value);
 
         await repository.CommitAsync(message.Id, _clientId, cancellationToken);
 

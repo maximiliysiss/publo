@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Publo.Abstraction.Executor;
 using Publo.Postgres.Entities;
@@ -193,7 +194,8 @@ public sealed class PostgresRepositoryTests : IAsyncLifetime
     private IPostgresRepository Create() => new PostgresRepository(
         connectionFactory: _fixture.Services.GetRequiredService<IConnectionFactory>(),
         options: _fixture.Services.GetRequiredService<IOptions<PostgresPubloOptions>>(),
-        dateTimeProvider: _fixture.Services.GetRequiredService<IDateTimeProvider>());
+        dateTimeProvider: _fixture.Services.GetRequiredService<IDateTimeProvider>(),
+        logger: NullLogger<PostgresRepository>.Instance);
 
     public Task InitializeAsync()
         => _fixture.Services.GetRequiredService<IInfrastructureReadinessWaiter>().WaitAsync(CancellationToken.None);

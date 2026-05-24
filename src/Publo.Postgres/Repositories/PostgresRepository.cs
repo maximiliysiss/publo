@@ -4,6 +4,7 @@ using System.Data.Common;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Npgsql;
 using NpgsqlTypes;
@@ -23,13 +24,17 @@ internal sealed class PostgresRepository : IPostgresRepository
 
     private readonly IDateTimeProvider _dateTimeProvider;
 
+    private readonly ILogger<PostgresRepository> _logger;
+
     public PostgresRepository(
         IConnectionFactory connectionFactory,
         IOptions<PostgresPubloOptions> options,
-        IDateTimeProvider dateTimeProvider)
+        IDateTimeProvider dateTimeProvider,
+        ILogger<PostgresRepository> logger)
     {
         _connectionFactory = connectionFactory;
         _dateTimeProvider = dateTimeProvider;
+        _logger = logger;
         _options = options.Value;
     }
 
@@ -39,13 +44,16 @@ internal sealed class PostgresRepository : IPostgresRepository
 INSERT INTO {_options.SchemaName}.messages (type, created_at, payload)
 VALUES (:type, :createdAt, :payload)";
 
+        var messageType = typeof(T).GetVersionFreeFullName();
+        _logger.AddingPostgresMessage(messageType);
+
         await using var connection = await _connectionFactory.GetConnectionAsync(cancellationToken);
 
         await using DbCommand command = new DbCommandInitializer(sql, connection)
         {
             Parameters =
             {
-                { "type", typeof(T).GetVersionFreeFullName() },
+                { "type", messageType },
                 { "createdAt", _dateTimeProvider.GetNow() },
                 { "payload", JsonSerializer.Serialize(message), NpgsqlDbType.Jsonb },
             }
@@ -54,6 +62,7 @@ VALUES (:type, :createdAt, :payload)";
         await connection.OpenAsync(cancellationToken);
 
         await command.ExecuteNonQueryAsync(cancellationToken);
+        _logger.PostgresMessageAdded(messageType);
     }
 
     public async Task<Message?> GetAsync(ClientId clientId, DateTimeOffset? from, CancellationToken cancellationToken)
@@ -85,18 +94,31 @@ LIMIT 1;
         var isRead = await reader.ReadAsync(cancellationToken);
 
         if (!isRead)
+        {
+            _logger.NoPendingPostgresMessage(clientId.Value);
             return null;
+        }
 
-        var type = Type.GetType(reader.GetString("type"));
+        var messageId = reader.GetInt64("id");
+        _logger.PostgresMessageSelected(messageId, clientId.Value);
+
+        var typeName = reader.GetString("type");
+        var type = Type.GetType(typeName);
         if (type is null)
-            throw new InvalidOperationException($"Type '{reader.GetString("type")}' not found");
+        {
+            _logger.TypeNotFound(typeName);
+            throw new InvalidOperationException($"Type '{typeName}' not found");
+        }
 
         var message = JsonSerializer.Deserialize(reader.GetString("payload"), type);
         if (message is null)
+        {
+            _logger.ValueNotFound(typeName);
             throw new InvalidOperationException($"Message payload not found");
+        }
 
         return new Message(
-            Id: new MessageId(reader.GetInt64("id")),
+            Id: new MessageId(messageId),
             Payload: message,
             Type: type,
             CreatedAt: reader.GetFieldValue<DateTimeOffset>("created_at"));
@@ -108,6 +130,8 @@ LIMIT 1;
 INSERT INTO {_options.SchemaName}.clients (id, created_at)
 VALUES (:clientId, :createdAt);
 ";
+
+        _logger.CreatingPostgresClient(clientId.Value);
 
         await using var connection = await _connectionFactory.GetConnectionAsync(cancellationToken);
 
@@ -123,6 +147,7 @@ VALUES (:clientId, :createdAt);
         await connection.OpenAsync(cancellationToken);
 
         await command.ExecuteNonQueryAsync(cancellationToken);
+        _logger.PostgresClientCreated(clientId.Value);
     }
 
     public async Task CommitAsync(MessageId messageId, ClientId clientId, CancellationToken cancellationToken)
@@ -131,6 +156,8 @@ VALUES (:clientId, :createdAt);
 INSERT INTO {_options.SchemaName}.handled(client_id, message_id, created_at)
 VALUES (:clientId, :messageId, :createdAt);
 ";
+
+        _logger.CommittingPostgresMessage(messageId.Value, clientId.Value);
 
         await using var connection = await _connectionFactory.GetConnectionAsync(cancellationToken);
 
@@ -147,5 +174,6 @@ VALUES (:clientId, :messageId, :createdAt);
         await connection.OpenAsync(cancellationToken);
 
         await command.ExecuteNonQueryAsync(cancellationToken);
+        _logger.PostgresMessageCommitted(messageId.Value, clientId.Value);
     }
 }

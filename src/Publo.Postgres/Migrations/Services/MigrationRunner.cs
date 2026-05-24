@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Npgsql;
+using Publo.Postgres.Extensions;
 using Publo.Postgres.Infrastructure.Database;
 using Publo.Postgres.Migrations.Configuration;
 using Publo.Postgres.Migrations.Infrastructure;
@@ -27,6 +28,8 @@ internal sealed class MigrationRunner : IMigrationRunner
 
     private readonly ILoggerFactory _loggerFactory;
 
+    private readonly ILogger<MigrationRunner> _logger;
+
     public MigrationRunner(
         IConnectionFactory connectionFactory,
         IOptions<MigrationOptions> options,
@@ -34,11 +37,14 @@ internal sealed class MigrationRunner : IMigrationRunner
     {
         _connectionFactory = connectionFactory;
         _loggerFactory = loggerFactory;
+        _logger = loggerFactory.CreateLogger<MigrationRunner>();
         _options = options.Value;
     }
 
     public async Task MigrateUpAsync(CancellationToken cancellationToken)
     {
+        _logger.StartingPostgresMigrations(_options.SchemaName);
+
         var @lock = new PostgresDistributedLock(
             key: new PostgresAdvisoryLockKey(nameof(MigrationRunner), allowHashing: true),
             connectionString: _connectionFactory.GetConnectionString());
@@ -71,6 +77,7 @@ internal sealed class MigrationRunner : IMigrationRunner
         // Migrate
         var runner = serviceProvider.GetRequiredService<FluentMigrator.Runner.IMigrationRunner>();
         runner.MigrateUp();
+        _logger.PostgresMigrationsCompleted(_options.SchemaName);
 
         // Reload types
         await using var connection = await _connectionFactory.GetConnectionAsync(cancellationToken);
@@ -79,8 +86,10 @@ internal sealed class MigrationRunner : IMigrationRunner
 
         if (npgsqlConnection is not null)
         {
+            _logger.ReloadingNpgsqlTypes();
             await npgsqlConnection.OpenAsync(cancellationToken);
             await npgsqlConnection.ReloadTypesAsync(cancellationToken);
+            _logger.NpgsqlTypesReloaded();
         }
     }
 }

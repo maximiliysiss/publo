@@ -44,6 +44,7 @@ internal sealed class KafkaConsumer : RestartableService
         using var consumer = new LocalConsumer(new ConsumerBuilder<string, string>(consumerConfig).Build());
 
         consumer.Subscribe(_options.Topic);
+        _logger.KafkaConsumerSubscribed(_options.Topic);
 
         while (!cancellationToken.IsCancellationRequested)
         {
@@ -59,6 +60,11 @@ internal sealed class KafkaConsumer : RestartableService
 
                 continue;
             }
+
+            _logger.KafkaMessageReceived(
+                message.Topic,
+                message.Partition.Value,
+                message.Offset.Value);
 
             var type = message.Message.Key.GetMessageType();
             if (type is null)
@@ -94,8 +100,13 @@ internal sealed class KafkaConsumer : RestartableService
             await nonGenericExecutor.ExecuteAsync(
                 message: value,
                 cancellationToken: cancellationToken);
+            _logger.KafkaMessageHandled(message.Message.Key);
 
             consumer.Commit(message);
+            _logger.KafkaMessageCommitted(
+                message.Topic,
+                message.Partition.Value,
+                message.Offset.Value);
         }
 
         return;
