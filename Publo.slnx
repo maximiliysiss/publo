@@ -18,5 +18,7 @@
     <Project Path="tests/Publo.Abstraction.UnitTests/Publo.Abstraction.UnitTests.csproj" />
     <Project Path="tests/Publo.Kafka.IntegrationTests/Publo.Kafka.IntegrationTests.csproj" />
     <Project Path="tests/Publo.Kafka.UnitTests/Publo.Kafka.UnitTests.csproj" />
+    <Project Path="tests/Publo.Postgres.IntegrationTests/Publo.Postgres.IntegrationTests.csproj" />
+    <Project Path="tests/Publo.Postgres.UnitTests/Publo.Postgres.UnitTests.csproj" />
   </Folder>
 </Solution>

@@ -1,10 +1,10 @@
 using System;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Publo.Kafka.Extensions;
+using Publo.Postgres.Extensions;
 using Xunit;
 
-namespace Publo.Kafka.UnitTests.Extensions;
+namespace Publo.Postgres.UnitTests.Extensions;
 
 public class ExceptionExtensionsTests
 {

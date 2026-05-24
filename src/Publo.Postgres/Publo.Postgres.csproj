@@ -2,4 +2,16 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="DistributedLock.Postgres" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
+    <PackageReference Include="FluentMigrator.Runner" />
+    <PackageReference Include="Npgsql" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
+    <PackageReference Include="Polly" />
+    <PackageReference Include="StronglyTypedId" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Publo.Abstraction\Publo.Abstraction.csproj" />
+  </ItemGroup>
 </Project>
