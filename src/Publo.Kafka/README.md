@@ -1,10 +1,15 @@
 # Publo.Kafka
 
-Kafka provider for Publo. It publishes messages to one Kafka topic and runs a hosted consumer that
-dispatches messages to `IPubloExecutor<T>` handlers.
+Kafka provider for Publo broadcast events. It publishes events to one Kafka topic and runs a hosted
+consumer that dispatches events to `IPubloExecutor<T>` handlers in each running pod or application
+instance.
 
 The provider uses `Confluent.Kafka` and stores the .NET message type in the Kafka message key so the
 consumer can resolve the matching executor.
+
+Use this provider when your services already have Kafka-compatible infrastructure and you want an
+easy way to notify every running pod about cluster-wide events such as cache invalidations,
+configuration refreshes, and local state updates.
 
 ## Installation
 
@@ -47,7 +52,7 @@ Options:
 
 | Name | Default | Description |
 | --- | --- | --- |
-| `Topic` | empty string | Kafka topic used for producing and consuming Publo messages. |
+| `Topic` | empty string | Kafka topic used for producing and consuming Publo broadcast events. |
 | `SkipPolicy` | `Soft` | Controls how unsupported messages are handled. |
 | `ConsumerConfig` | empty dictionary | Values passed to `Confluent.Kafka.ConsumerConfig`. |
 | `ProducerConfig` | empty dictionary | Values passed to `Confluent.Kafka.ProducerConfig`. |
@@ -55,7 +60,7 @@ Options:
 `SkipPolicy.Strict` throws when the consumer cannot read, resolve, or deserialize a message.
 `SkipPolicy.Soft` skips unsupported messages when possible and continues processing.
 
-## Sending And Handling
+## Publishing And Handling
 
 ```csharp
 using Publo.Abstraction.Executor;
@@ -67,7 +72,7 @@ public sealed class UserCreatedExecutor : IPubloExecutor<UserCreated>
 {
     public Task HandleAsync(UserCreated message, CancellationToken cancellationToken)
     {
-        // Handle the message here.
+        // React to the broadcast event here.
         return Task.CompletedTask;
     }
 }

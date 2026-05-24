@@ -1,8 +1,8 @@
 # Publo.Postgres
 
-PostgreSQL provider for Publo. It stores sent messages in PostgreSQL, runs migrations for the Publo
-schema, and starts a hosted runner that polls stored messages and dispatches them to
-`IPubloExecutor<T>` handlers.
+PostgreSQL provider for Publo broadcast events. It stores published events in PostgreSQL, runs
+migrations for the Publo schema, and starts a hosted runner that polls stored events and dispatches
+them to `IPubloExecutor<T>` handlers in each running pod or application instance.
 
 ## Installation
 
@@ -39,6 +39,10 @@ public sealed class ConnectionFactory(IConfiguration configuration) : IConnectio
 `UseNpgsql<T>` registers the provider, repository, migrations, options binding, and polling hosted
 service.
 
+Use this provider when you want cluster-wide notifications without introducing Kafka. Each running
+instance can poll the PostgreSQL-backed event log and react locally to events such as cache
+invalidations, configuration refreshes, and other broadcast signals.
+
 ## Configuration
 
 `UseNpgsql<T>` binds options from the `PostgresPubloOptions` configuration section:
@@ -60,14 +64,14 @@ Options:
 
 | Name | Default | Description |
 | --- | --- | --- |
-| `SchemaName` | `publo` | PostgreSQL schema used for Publo tables and migration metadata. |
+| `SchemaName` | `publo` | PostgreSQL schema used for Publo event tables and migration metadata. |
 | `PollingInterval` | `00:00:05` | Delay between polling attempts after the current batch is drained. |
-| `OffsetPolicy` | `Latest` | Controls where a new runner starts reading messages. |
+| `OffsetPolicy` | `Latest` | Controls where a new runner starts reading events. |
 
-`OffsetPolicy.Latest` starts from messages created after the runner starts. `OffsetPolicy.Earliest`
-starts from the earliest uncommitted message available to the runner.
+`OffsetPolicy.Latest` starts from events created after the runner starts. `OffsetPolicy.Earliest`
+starts from the earliest uncommitted event available to the runner.
 
-## Sending And Handling
+## Publishing And Handling
 
 ```csharp
 using Publo.Abstraction.Executor;
@@ -79,7 +83,7 @@ public sealed class UserCreatedExecutor : IPubloExecutor<UserCreated>
 {
     public Task HandleAsync(UserCreated message, CancellationToken cancellationToken)
     {
-        // Handle the message here.
+        // React to the broadcast event here.
         return Task.CompletedTask;
     }
 }

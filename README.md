@@ -1,7 +1,7 @@
 <div align="center">
   <img src="assets/publo-icon.png" alt="Publo" width="120" height="120">
   <h1>Publo</h1>
-  <p>A small .NET messaging abstraction with provider packages for Kafka and PostgreSQL.</p>
+  <p>A small .NET broadcast event abstraction for notifying every running pod or application instance.</p>
 
   <p>
     <a href="https://github.com/maximiliysiss/publo/actions/workflows/dotnet.yml"><img alt="Build" src="https://github.com/maximiliysiss/publo/actions/workflows/dotnet.yml/badge.svg"></a>
@@ -10,21 +10,31 @@
   </p>
 </div>
 
-The core package exposes one sending API, `IPubloService`, and one handler contract,
-`IPubloExecutor<T>`. Provider packages decide where messages are stored or delivered and run hosted
-services that dispatch received messages to registered executors.
+Publo is designed for broadcasting application events across horizontally scaled .NET services. When
+one pod publishes an event, every running pod can receive it and dispatch it to local
+`IPubloExecutor<T>` handlers. This is useful for cache invalidation, configuration refreshes,
+in-process state synchronization, and other cluster-wide notifications.
+
+The core package exposes one publishing API, `IPubloService`, and one handler contract,
+`IPubloExecutor<T>`. Provider packages decide where events are stored or delivered and run hosted
+services that dispatch received events to registered executors.
 
 ## Packages
 
 | Package | NuGet | Purpose | Target framework |
 | --- | --- | --- | --- |
-| `Publo.Abstraction` | [![NuGet](https://img.shields.io/nuget/v/Publo.Abstraction?label=version)](https://www.nuget.org/packages/Publo.Abstraction) [![Downloads](https://img.shields.io/nuget/dt/Publo.Abstraction?label=downloads)](https://www.nuget.org/packages/Publo.Abstraction) | Core service, handler, provider, and DI registration contracts. | `netstandard2.0` |
-| `Publo.Kafka` | [![NuGet](https://img.shields.io/nuget/v/Publo.Kafka?label=version)](https://www.nuget.org/packages/Publo.Kafka) [![Downloads](https://img.shields.io/nuget/dt/Publo.Kafka?label=downloads)](https://www.nuget.org/packages/Publo.Kafka) | Kafka producer and consumer provider built on `Confluent.Kafka`. | `net8.0` |
-| `Publo.Postgres` | [![NuGet](https://img.shields.io/nuget/v/Publo.Postgres?label=version)](https://www.nuget.org/packages/Publo.Postgres) [![Downloads](https://img.shields.io/nuget/dt/Publo.Postgres?label=downloads)](https://www.nuget.org/packages/Publo.Postgres) | PostgreSQL-backed message store and polling runner. | `net8.0` |
+| `Publo.Abstraction` | [![NuGet](https://img.shields.io/nuget/v/Publo.Abstraction?label=version)](https://www.nuget.org/packages/Publo.Abstraction) [![Downloads](https://img.shields.io/nuget/dt/Publo.Abstraction?label=downloads)](https://www.nuget.org/packages/Publo.Abstraction) | Core broadcast service, handler, provider, and DI registration contracts. | `netstandard2.0` |
+| `Publo.Kafka` | [![NuGet](https://img.shields.io/nuget/v/Publo.Kafka?label=version)](https://www.nuget.org/packages/Publo.Kafka) [![Downloads](https://img.shields.io/nuget/dt/Publo.Kafka?label=downloads)](https://www.nuget.org/packages/Publo.Kafka) | Kafka producer and consumer provider built on `Confluent.Kafka` for broadcast event delivery. | `net8.0` |
+| `Publo.Postgres` | [![NuGet](https://img.shields.io/nuget/v/Publo.Postgres?label=version)](https://www.nuget.org/packages/Publo.Postgres) [![Downloads](https://img.shields.io/nuget/dt/Publo.Postgres?label=downloads)](https://www.nuget.org/packages/Publo.Postgres) | PostgreSQL-backed broadcast event store and polling runner. | `net8.0` |
+
+## Intended Use
+
+Publo is for broadcast notifications between pods or service instances. It is not intended to be a
+general-purpose task queue where each message is processed by exactly one worker.
 
 ## Basic Usage
 
-Register Publo with a provider and register one executor per message type:
+Register Publo with a provider and register one executor per event type:
 
 ```csharp
 using Publo.Abstraction.Executor;
@@ -41,13 +51,13 @@ public sealed class UserCreatedExecutor : IPubloExecutor<UserCreated>
 {
     public Task HandleAsync(UserCreated message, CancellationToken cancellationToken)
     {
-        // Handle the message here.
+        // React to the broadcast event here.
         return Task.CompletedTask;
     }
 }
 ```
 
-Send messages through `IPubloService`:
+Publish events through `IPubloService`:
 
 ```csharp
 using Publo.Abstraction.Services;

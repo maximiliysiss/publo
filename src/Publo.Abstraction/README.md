@@ -1,9 +1,9 @@
 # Publo.Abstraction
 
-Core contracts and dependency injection helpers for Publo.
+Core contracts and dependency injection helpers for Publo broadcast events.
 
-Use this package when you need the common sending and handling APIs, or when you want to implement a
-custom Publo provider.
+Use this package when you need the common publishing and handling APIs for notifying every running
+pod or application instance, or when you want to implement a custom Publo provider.
 
 ## Installation
 
@@ -13,7 +13,7 @@ dotnet add package Publo.Abstraction
 
 ## Public API
 
-`IPubloService` is the application-facing service used to send messages:
+`IPubloService` is the application-facing service used to publish broadcast events:
 
 ```csharp
 using Publo.Abstraction.Services;
@@ -27,7 +27,7 @@ public sealed class UsersService(IPubloService publo)
 public sealed record UserCreated(Guid UserId);
 ```
 
-`IPubloExecutor<T>` handles received messages:
+`IPubloExecutor<T>` handles received broadcast events:
 
 ```csharp
 using Publo.Abstraction.Executor;
@@ -36,14 +36,14 @@ public sealed class UserCreatedExecutor : IPubloExecutor<UserCreated>
 {
     public Task HandleAsync(UserCreated message, CancellationToken cancellationToken)
     {
-        // Handle the message here.
+        // React to the broadcast event here.
         return Task.CompletedTask;
     }
 }
 ```
 
-`AddPublo` registers the sending service and configures a provider. `AddPubloExecutor` registers
-message handlers:
+`AddPublo` registers the publishing service and configures a provider. `AddPubloExecutor` registers
+event handlers:
 
 ```csharp
 using Publo.Abstraction.Extensions;
@@ -66,7 +66,7 @@ public sealed class InMemoryPubloProvider : IPubloProvider
 {
     public Task SendAsync<T>(T message, CancellationToken cancellationToken)
     {
-        // Send or persist the message here.
+        // Publish or persist the broadcast event here.
         return Task.CompletedTask;
     }
 }
@@ -74,5 +74,5 @@ public sealed class InMemoryPubloProvider : IPubloProvider
 builder.Services.AddPublo(publo => publo.UseProvider<InMemoryPubloProvider>());
 ```
 
-Provider implementations are responsible for delivering received messages to registered
+Provider implementations are responsible for delivering received events to registered
 `IPubloExecutor<T>` implementations.
