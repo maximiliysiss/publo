@@ -16,10 +16,12 @@
 
   <ItemGroup>
     <None Include="README.md" Pack="true" PackagePath="\" />
+    <None Include="$(MSBuildThisFileDirectory)..\assets\publo-icon.png" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <PropertyGroup>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>publo-icon.png</PackageIcon>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Authors>maximiliysiss</Authors>
     <Copyright>Copyright © 2026 maximiliysiss</Copyright>
